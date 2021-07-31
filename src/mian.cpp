@@ -18,9 +18,10 @@
 #if defined(LILYGO_T5_V102) || defined(LILYGO_EPD_DISPLAY_102)
 #include <GxGDGDEW0102T4/GxGDGDEW0102T4.h> //1.02" b/w
 #elif defined(LILYGO_T5_V266)
-#include <GxDEPG0266BN/GxDEPG0266BN.h>    // 2.66" b/w   form DKE GROUP
+#include <GxDEPG0266BN/GxDEPG0266BN.h> // 2.66" b/w   form DKE GROUP
 #elif defined(LILYGO_T5_V213)
-#include <GxDEPG0213BN/GxDEPG0213BN.h>    // 2.13" b/w  form DKE GROUP
+#include <GxGDEM0213B74/GxGDEM0213B74.h>
+// #include <GxDEPG0213BN/GxDEPG0213BN.h>    // 2.13" b/w  form DKE GROUP
 #else
 // #include <GxGDGDEW0102T4/GxGDGDEW0102T4.h> //1.02" b/w
 // #include <GxGDEW0154Z04/GxGDEW0154Z04.h>  // 1.54" b/w/r 200x200
@@ -49,10 +50,9 @@
 #include <GxIO/GxIO.h>
 #include <WiFi.h>
 
-GxIO_Class io(SPI,  EPD_CS, EPD_DC,  EPD_RSET);
+GxIO_Class io(SPI, EPD_CS, EPD_DC, EPD_RSET);
 GxEPD_Class display(io, EPD_RSET, EPD_BUSY);
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
-
 
 void setup(void)
 {
@@ -60,43 +60,34 @@ void setup(void)
     Serial.println();
     Serial.println("setup");
 
-#if defined(LILYGO_EPD_DISPLAY_102)
-    pinMode(EPD_POWER_ENABLE, OUTPUT);
-    digitalWrite(EPD_POWER_ENABLE, HIGH);
-#endif /*LILYGO_EPD_DISPLAY_102*/
-#if defined(LILYGO_T5_V102)
-    pinMode(POWER_ENABLE, OUTPUT);
-    digitalWrite(POWER_ENABLE, HIGH);
-#endif /*LILYGO_T5_V102*/
-
     SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI);
     display.init(); // enable diagnostic output on Serial
+    // display.eraseDisplay();
+
+    // display.fillScreen(GxEPD_WHITE);
+    // display.setTextColor(GxEPD_BLACK);
     u8g2Fonts.begin(display);
 
+    u8g2Fonts.setFontMode(1);                  // use u8g2 transparent mode (this is default)
+    u8g2Fonts.setFontDirection(0);             // left to right (this is default)
+    u8g2Fonts.setForegroundColor(GxEPD_BLACK); // apply Adafruit GFX color
+    u8g2Fonts.setBackgroundColor(GxEPD_WHITE); // apply Adafruit GFX color
 
+    u8g2Fonts.setFont(u8g2_font_helvR14_tf); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
 
-        u8g2Fonts.setFontMode(1);                           // use u8g2 transparent mode (this is default)
-    u8g2Fonts.setFontDirection(0);                      // left to right (this is default)
-    u8g2Fonts.setForegroundColor(GxEPD_BLACK);          // apply Adafruit GFX color
-    u8g2Fonts.setBackgroundColor(GxEPD_WHITE);          // apply Adafruit GFX color
-
-    u8g2Fonts.setFont(u8g2_font_helvR14_tf);            // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
-
-    uint16_t x = display.width() / 2 - 60 ;
+    uint16_t x = display.width() / 2 - 60;
     uint16_t y = display.height() / 2;
 
     display.fillScreen(GxEPD_WHITE);
 
-    u8g2Fonts.setCursor(x, y);                          // start writing at this position
-    u8g2Fonts.print("Fuck U Man!");
-
-    u8g2Fonts.setFont(u8g2_font_unifont_t_chinese2);    // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
-    u8g2Fonts.setCursor(x + 25, y + 32);
-    u8g2Fonts.print("大大的有");
+    u8g2Fonts.setCursor(x, y); // start writing at this position
+    u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312);
+    u8g2Fonts.print("我能吞下玻璃");
+    u8g2Fonts.setCursor(x + 32, y + 32);
+    u8g2Fonts.print("而不伤身体！");
 
     display.update();
 }
-
 
 void loop()
 {
